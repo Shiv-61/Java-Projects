@@ -2,22 +2,32 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
+import java.time.LocalDateTime;
 
 class Bank extends Frame implements ActionListener {
     static ArrayList<UserData> userDataList = new ArrayList<>();
-    Button log_b, create_b, Pay;
+    Button log_b, create_b, Pay,Transaction_history;
     TextField User_name, Acc_num, Mob_num, exp, Passwd;
 
-    // User data
-    String store_name, store_mob_num, store_acc_num, store_pass, store_valid;
+    Label nameLabel = new Label("Enter User ACC to pay: ");
+    TextField userAccField = new TextField(20);
 
-    int balance = 2000;
+    Label amountLabel = new Label("Enter Amount to pay: ");
+        TextField amountField = new TextField(20);
+
+    // User data
+    String store_name, store_mob_num, store_acc_num, store_pass, store_valid, to_acc,to_amount;
+
+    int balance = 20000;
     int User_id=0;
 
     static ArrayList<String> database_pass = new ArrayList<>();
     static ArrayList<String> database_name = new ArrayList<>();
     static ArrayList<String> database_acc_num = new ArrayList<>();
     static ArrayList<String> database_mob_num = new ArrayList<>();
+    static ArrayList<String> database_sent_to = new ArrayList<>();
+    static ArrayList<String> database_sent_amount = new ArrayList<>();
 
     GridBagConstraints gbc = new GridBagConstraints();
 
@@ -270,9 +280,88 @@ class Bank extends Frame implements ActionListener {
             }
         });
 
+        Transaction_history = new Button("Transaction History");
+        Transaction_history.setBounds(600, 600, 200, 30);
+        add(Transaction_history);
+        Transaction_history.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                History();
+            }
+        });
         add(p);
         p.setBounds(0, 0, 500, 250);
     }
+    
+    public void History() {
+        Dialog th = new Dialog(this, "Transaction History", true);
+        th.setSize(700, 700);
+        th.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+    
+        List<Transaction> transactionList = loadTransactions();
+    
+        if (transactionList.isEmpty()) {
+            Label temp_msg = new Label("No Transaction History Available");
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            th.add(temp_msg, gbc);
+        } else {
+            Label heading = new Label("Transaction History:");
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+            th.add(heading, gbc);
+    
+            // Loop through transaction history
+            int row = 1;
+            for (Transaction transaction : transactionList) {
+                Label transactionDetail = new Label(transaction.toString());
+                gbc.gridx = 0;
+                gbc.gridy = row++;
+                th.add(transactionDetail, gbc);
+            }
+        }
+    
+        Button closeButton = new Button("Close");
+        gbc.gridx = 0;
+        gbc.gridy = 10;
+        th.add(closeButton, gbc);
+        closeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                th.dispose();
+            }
+        });
+    
+        th.setVisible(true);
+    }
+    
+    public void saveTransaction(Transaction transaction) {
+        try (FileOutputStream fos = new FileOutputStream("Transaction.dat", true);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(transaction);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Transaction> loadTransactions() {
+    List<Transaction> transactionList = new ArrayList<>();
+    try (FileInputStream fis = new FileInputStream("Transaction.dat");
+         ObjectInputStream ois = new ObjectInputStream(fis)) {
+
+        while (true) {
+            try {
+                Transaction transaction = (Transaction) ois.readObject();
+                transactionList.add(transaction);
+            } catch (EOFException eof) {
+                break;  // End of file reached
+            }
+        }
+    } catch (IOException | ClassNotFoundException e) {
+        e.printStackTrace();
+    }
+    return transactionList;
+}
 
     public void Transfer() {
         Dialog d = new Dialog(this, "Pay By ACC", true);
@@ -280,34 +369,30 @@ class Bank extends Frame implements ActionListener {
         d.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-
-        Label nameLabel = new Label("Enter User ACC to pay: ");
-        TextField userAccField = new TextField(20);
+    
         gbc.gridx = 0;
         gbc.gridy = 0;
         d.add(nameLabel, gbc);
         gbc.gridx = 1;
         d.add(userAccField, gbc);
-
-        Label amountLabel = new Label("Enter Amount to pay: ");
-        TextField amountField = new TextField(20);
+    
         gbc.gridx = 0;
         gbc.gridy = 1;
         d.add(amountLabel, gbc);
         gbc.gridx = 1;
         d.add(amountField, gbc);
-
+    
         Button payButton = new Button("Pay");
         gbc.gridx = 0;
         gbc.gridy = 2;
         d.add(payButton, gbc);
-
+    
         Label messageLabel = new Label();
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         d.add(messageLabel, gbc);
-
+    
         payButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String userAcc = userAccField.getText();
@@ -322,6 +407,15 @@ class Bank extends Frame implements ActionListener {
                         balance -= amount;
                         messageLabel.setForeground(Color.green);
                         messageLabel.setText("Payment successful! Remaining balance: " + balance);
+    
+                        // Create and save the transaction for the logged-in user
+                        UserData currentUser = findUserByAccountNumber(store_acc_num);
+                        if (currentUser != null) {
+                            Transaction newTransaction = new Transaction(userAcc, amount, LocalDateTime.now());
+                            currentUser.addTransaction(userAcc, amount, LocalDateTime.now());
+                            saveTransaction(newTransaction);  // Save transaction to file
+                            saveUserData();  // Save updated user data
+                        }
                     }
                 } catch (NumberFormatException ex) {
                     messageLabel.setForeground(Color.red);
@@ -329,7 +423,7 @@ class Bank extends Frame implements ActionListener {
                 }
             }
         });
-
+    
         d.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
                 saveUserData();
@@ -337,9 +431,20 @@ class Bank extends Frame implements ActionListener {
                 d.dispose();
             }
         });
-
+    
         d.setVisible(true);
     }
+    
+    // Find a user by account number (helper function)
+    public UserData findUserByAccountNumber(String accountNumber) {
+        for (UserData user : userDataList) {
+            if (user.accountNumber.equals(accountNumber)) {
+                return user;
+            }
+        }
+        return null;  // Return null if no user found
+    }
+    
 
     public static void saveUserData() {
         try (FileOutputStream fos = new FileOutputStream("users.dat");
@@ -428,20 +533,68 @@ class Bank extends Frame implements ActionListener {
             
       }//end of main method
 }
-
 //Conversion of the instance into Bytes through serialization
-class UserData implements Serializable{
-      String name, password, mobileNumber, accountNumber;
+// class UserData implements Serializable{
+//       String name, password, mobileNumber, accountNumber,sent_acc,sent_amount;
 
-      UserData(String name, String password, String mobileNumber, String accountNumber) {
-          this.name = name;
-          this.password = password;
-          this.mobileNumber = mobileNumber;
-          this.accountNumber = accountNumber;
-      }
+//       UserData(String name, String password, String mobileNumber, String accountNumber, String accString, String amountString) {
+//           this.name = name;
+//           this.password = password;
+//           this.mobileNumber = mobileNumber;
+//           this.accountNumber = accountNumber;
+//           this.sent_acc = accString;
+//           this.sent_amount = amountString;
+//       }
+//       UserData(String name, String password, String mobileNumber, String accountNumber) {
+//           this.name = name;
+//           this.password = password;
+//           this.mobileNumber = mobileNumber;
+//           this.accountNumber = accountNumber;
+//       }
   
-      // For displaying user details
-      public String toString() {
-          return "Name: " + name + ", Password: " + password + ", Mobile: " + mobileNumber + ", Account: " + accountNumber;
-      }
-}  
+//       // For displaying user details
+//       public String toString() {
+//           return "Name: " + name + ", Password: " + password + ", Mobile: " + mobileNumber + ", Account: " + accountNumber + ", To: " + sent_acc + ", Sent Amount: " + sent_amount;
+//       }
+// }  
+
+class UserData implements Serializable {
+    String name, password, mobileNumber, accountNumber;
+    ArrayList<Transaction> transactions;  // Store transaction history
+
+    UserData(String name, String password, String mobileNumber, String accountNumber) {
+        this.name = name;
+        this.password = password;
+        this.mobileNumber = mobileNumber;
+        this.accountNumber = accountNumber;
+        this.transactions = new ArrayList<>();  // Initialize transaction history
+    }
+
+    // Add a transaction to the history
+    public void addTransaction(String toAccount, int amount, LocalDateTime timestamp) {
+        transactions.add(new Transaction(toAccount, amount, timestamp));
+    }
+
+    // For displaying user details
+    public String toString() {
+        return "Name: " + name + ", Mobile: " + mobileNumber + ", Account: " + accountNumber;
+    }
+}
+
+class Transaction implements Serializable {
+    String toAccount;
+    int amount;
+    LocalDateTime timestamp;
+
+    Transaction(String toAccount, int amount, LocalDateTime timestamp) {
+        this.toAccount = toAccount;
+        this.amount = amount;
+        this.timestamp = timestamp;
+    }
+
+    @Override
+    public String toString() {
+        return "To: " + toAccount + ", Amount: " + amount + ", Timestamp: " + timestamp;
+    }
+}
+
