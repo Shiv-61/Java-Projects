@@ -7,20 +7,20 @@ import java.time.LocalDateTime;
 
 class Bank extends Frame implements ActionListener {
     static ArrayList<UserData> userDataList = new ArrayList<>();
-    Button log_b, create_b, Pay,Transaction_history;
+    Button log_b, create_b, Pay, Transaction_history;
     TextField User_name, Acc_num, Mob_num, exp, Passwd;
 
     Label nameLabel = new Label("Enter User ACC to pay: ");
     TextField userAccField = new TextField(20);
 
     Label amountLabel = new Label("Enter Amount to pay: ");
-        TextField amountField = new TextField(20);
+    TextField amountField = new TextField(20);
 
     // User data
-    String store_name, store_mob_num, store_acc_num, store_pass, store_valid, to_acc,to_amount;
+    String store_name, store_mob_num, store_acc_num, store_pass, store_valid, to_acc, to_amount;
 
     int balance = 20000;
-    int User_id=0;
+    int User_id = 0;
 
     static ArrayList<String> database_pass = new ArrayList<>();
     static ArrayList<String> database_name = new ArrayList<>();
@@ -31,8 +31,8 @@ class Bank extends Frame implements ActionListener {
 
     GridBagConstraints gbc = new GridBagConstraints();
 
-    Label name, num, acc, valid, pass;    
-    
+    Label name, num, acc, valid, pass;
+
     Label verify = new Label("");
 
     public Bank() {
@@ -97,11 +97,11 @@ class Bank extends Frame implements ActionListener {
 
         gbc.gridx = 0;
         gbc.gridy = 5;
-        add(valid,gbc);
-        
+        add(valid, gbc);
+
         gbc.gridx = 1;
         gbc.gridy = 5;
-        add(exp,gbc);
+        add(exp, gbc);
 
         log_b = new Button("Login");
         gbc.gridx = 0;
@@ -131,7 +131,7 @@ class Bank extends Frame implements ActionListener {
 
     public void actionPerformed(ActionEvent a) {
         if (a.getSource() == log_b) {
-           
+
             verify.revalidate();
 
             store_name = User_name.getText();
@@ -140,27 +140,27 @@ class Bank extends Frame implements ActionListener {
             store_pass = Passwd.getText();
 
             if (store_name.isEmpty() || store_mob_num.isEmpty() || store_acc_num.isEmpty() || store_pass.isEmpty()) {
-                  gbc.gridx = 0;
-                  gbc.gridy = 7;
-                  verify.setForeground(Color.red);
-                  verify.setText("Enter all values");
-                  add(verify,gbc);
+                gbc.gridx = 0;
+                gbc.gridy = 7;
+                verify.setForeground(Color.red);
+                verify.setText("Enter all values");
+                add(verify, gbc);
             } else if (store_mob_num.length() != 10 || store_acc_num.length() != 12) {
-                        gbc.gridx = 0;
-                        gbc.gridy = 7;
-                        verify.setForeground(Color.red);
-                        verify.setText("Recheck all values");
-                        add(verify,gbc);
+                gbc.gridx = 0;
+                gbc.gridy = 7;
+                verify.setForeground(Color.red);
+                verify.setText("Recheck all values");
+                add(verify, gbc);
             } else {
-                int flag = 0,i=0;
+                int flag = 0, i = 0;
                 int pass_index = -1;
                 for (UserData user : userDataList) {
-                  if (user.name.equals(store_name) && user.password.equals(store_pass)) {
+                    if (user.name.equals(store_name) && user.password.equals(store_pass)) {
                         flag++;
                         pass_index = i;
-                  }
-                  i++;
-                 }
+                    }
+                    i++;
+                }
                 if (flag > 0) {
 
                     if (database_pass.get(pass_index).equals(store_pass)) {
@@ -169,7 +169,7 @@ class Bank extends Frame implements ActionListener {
                         verify.revalidate();
                         verify.setForeground(Color.green);
                         verify.setText("Password Matched");
-                        add(verify,gbc);
+                        add(verify, gbc);
                         finalShow();
                     } else {
                         gbc.gridx = 0;
@@ -177,7 +177,7 @@ class Bank extends Frame implements ActionListener {
                         verify.revalidate();
                         verify.setForeground(Color.RED);
                         verify.setText("Incorrect Password");
-                        add(verify,gbc);
+                        add(verify, gbc);
                     }
                 } else {
                     gbc.gridx = 0;
@@ -185,12 +185,12 @@ class Bank extends Frame implements ActionListener {
                     verify.revalidate();
                     verify.setForeground(Color.red);
                     verify.setText("No such User, Try Creating a new Account");
-                    add(verify,gbc);
+                    add(verify, gbc);
                 }
             }
         } else if (a.getSource() == create_b) {
 
-            verify.revalidate(); 
+            verify.revalidate();
 
             store_name = User_name.getText();
             store_mob_num = Mob_num.getText();
@@ -199,22 +199,22 @@ class Bank extends Frame implements ActionListener {
             store_valid = exp.getText();
 
             if (store_name.isEmpty() || store_mob_num.isEmpty() || store_acc_num.isEmpty() || store_pass.isEmpty()) {
-                        gbc.gridx = 0;
-                        gbc.gridy = 7;
-                        verify.setForeground(Color.RED);
-                        verify.setText("Enter all values");
-                        add(verify,gbc);
+                gbc.gridx = 0;
+                gbc.gridy = 7;
+                verify.setForeground(Color.RED);
+                verify.setText("Enter all values");
+                add(verify, gbc);
             } else if (store_mob_num.length() != 10 || store_acc_num.length() != 12) {
-                  gbc.gridx = 0;
-                  gbc.gridy = 7;
-                  verify.setForeground(Color.red);
-                  verify.setText("Recheck all values");
-                  add(verify,gbc);
+                gbc.gridx = 0;
+                gbc.gridy = 7;
+                verify.setForeground(Color.red);
+                verify.setText("Recheck all values");
+                add(verify, gbc);
             } else {
-                
+
                 User_id++;
                 userDataList.add(new UserData(store_name, store_pass, store_mob_num, store_acc_num));
-                saveUserData(); 
+                saveUserData();
 
                 database_name.add(store_name);
                 database_pass.add(store_pass);
@@ -225,12 +225,13 @@ class Bank extends Frame implements ActionListener {
                 gbc.gridy = 7;
                 verify.setText("Account Created");
                 verify.setForeground(Color.GREEN);
-                add(verify,gbc);
+                add(verify, gbc);
                 finalShow();
             }
         }
     }
-     void finalShow() {
+
+    void finalShow() {
         // Show logged-in user's details and allow transfers
         removeAll();
         revalidate();
@@ -291,16 +292,16 @@ class Bank extends Frame implements ActionListener {
         add(p);
         p.setBounds(0, 0, 500, 250);
     }
-    
+
     public void History() {
         Dialog th = new Dialog(this, "Transaction History", true);
         th.setSize(700, 700);
         th.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-    
+
         List<Transaction> transactionList = loadTransactions();
-    
+
         if (transactionList.isEmpty()) {
             Label temp_msg = new Label("No Transaction History Available");
             gbc.gridx = 0;
@@ -311,7 +312,7 @@ class Bank extends Frame implements ActionListener {
             gbc.gridx = 0;
             gbc.gridy = 0;
             th.add(heading, gbc);
-    
+
             // Loop through transaction history
             int row = 1;
             for (Transaction transaction : transactionList) {
@@ -321,7 +322,7 @@ class Bank extends Frame implements ActionListener {
                 th.add(transactionDetail, gbc);
             }
         }
-    
+
         Button closeButton = new Button("Close");
         gbc.gridx = 0;
         gbc.gridy = 10;
@@ -331,13 +332,13 @@ class Bank extends Frame implements ActionListener {
                 th.dispose();
             }
         });
-    
+
         th.setVisible(true);
     }
-    
+
     public void saveTransaction(Transaction transaction) {
         try (FileOutputStream fos = new FileOutputStream("Transaction.dat", true);
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(transaction);
         } catch (IOException e) {
             e.printStackTrace();
@@ -345,23 +346,23 @@ class Bank extends Frame implements ActionListener {
     }
 
     public List<Transaction> loadTransactions() {
-    List<Transaction> transactionList = new ArrayList<>();
-    try (FileInputStream fis = new FileInputStream("Transaction.dat");
-         ObjectInputStream ois = new ObjectInputStream(fis)) {
+        List<Transaction> transactionList = new ArrayList<>();
+        try (FileInputStream fis = new FileInputStream("Transaction.dat");
+                ObjectInputStream ois = new ObjectInputStream(fis)) {
 
-        while (true) {
-            try {
-                Transaction transaction = (Transaction) ois.readObject();
-                transactionList.add(transaction);
-            } catch (EOFException eof) {
-                break;  // End of file reached
+            while (true) {
+                try {
+                    Transaction transaction = (Transaction) ois.readObject();
+                    transactionList.add(transaction);
+                } catch (EOFException eof) {
+                    break; // End of file reached
+                }
             }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
-    } catch (IOException | ClassNotFoundException e) {
-        e.printStackTrace();
+        return transactionList;
     }
-    return transactionList;
-}
 
     public void Transfer() {
         Dialog d = new Dialog(this, "Pay By ACC", true);
@@ -369,30 +370,30 @@ class Bank extends Frame implements ActionListener {
         d.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-    
+
         gbc.gridx = 0;
         gbc.gridy = 0;
         d.add(nameLabel, gbc);
         gbc.gridx = 1;
         d.add(userAccField, gbc);
-    
+
         gbc.gridx = 0;
         gbc.gridy = 1;
         d.add(amountLabel, gbc);
         gbc.gridx = 1;
         d.add(amountField, gbc);
-    
+
         Button payButton = new Button("Pay");
         gbc.gridx = 0;
         gbc.gridy = 2;
         d.add(payButton, gbc);
-    
+
         Label messageLabel = new Label();
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.gridwidth = 2;
         d.add(messageLabel, gbc);
-    
+
         payButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String userAcc = userAccField.getText();
@@ -407,14 +408,14 @@ class Bank extends Frame implements ActionListener {
                         balance -= amount;
                         messageLabel.setForeground(Color.green);
                         messageLabel.setText("Payment successful! Remaining balance: " + balance);
-    
+
                         // Create and save the transaction for the logged-in user
                         UserData currentUser = findUserByAccountNumber(store_acc_num);
                         if (currentUser != null) {
                             Transaction newTransaction = new Transaction(userAcc, amount, LocalDateTime.now());
                             currentUser.addTransaction(userAcc, amount, LocalDateTime.now());
-                            saveTransaction(newTransaction);  // Save transaction to file
-                            saveUserData();  // Save updated user data
+                            saveTransaction(newTransaction); // Save transaction to file
+                            saveUserData(); // Save updated user data
                         }
                     }
                 } catch (NumberFormatException ex) {
@@ -423,7 +424,7 @@ class Bank extends Frame implements ActionListener {
                 }
             }
         });
-    
+
         d.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
                 saveUserData();
@@ -431,10 +432,10 @@ class Bank extends Frame implements ActionListener {
                 d.dispose();
             }
         });
-    
+
         d.setVisible(true);
     }
-    
+
     // Find a user by account number (helper function)
     public UserData findUserByAccountNumber(String accountNumber) {
         for (UserData user : userDataList) {
@@ -442,13 +443,12 @@ class Bank extends Frame implements ActionListener {
                 return user;
             }
         }
-        return null;  // Return null if no user found
+        return null; // Return null if no user found
     }
-    
 
     public static void saveUserData() {
         try (FileOutputStream fos = new FileOutputStream("users.dat");
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+                ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(userDataList);
         } catch (IOException e) {
             e.printStackTrace();
@@ -457,117 +457,95 @@ class Bank extends Frame implements ActionListener {
 
     public static void loadUserData() {
         try (FileInputStream fis = new FileInputStream("users.dat");
-             ObjectInputStream ois = new ObjectInputStream(fis)) {
+                ObjectInputStream ois = new ObjectInputStream(fis)) {
             userDataList = (ArrayList<UserData>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             userDataList = new ArrayList<>();
         }
     }
 
-      public static void main(String[] args) {
-            System.out.println("Bank Server Open");
-            new Bank();
-            char ch;
-            Scanner sc = new Scanner(System.in);
-            int at_user;
-            int Choice;
-            while(true){
-                  System.out.println("Press 1 - Shut Down Bank Server \n 2- Get info of particular user \n 3 - Show All Users \n 4 - Remove any Particular User \nChoice: ");
-                  Choice = sc.nextInt();
-                  switch (Choice) {
-                        case 1:
-                        System.out.println("Please Confirm to Shut down(y/n) : ");
-                        ch = sc.next().charAt(0);
-                        if(ch=='y' || ch=='Y') {
-                              System.out.println("Bank Server Closed");
-                              System.exit(0);
+    public static void main(String[] args) {
+        System.out.println("Bank Server Open");
+        new Bank();
+        char ch;
+        Scanner sc = new Scanner(System.in);
+        int at_user;
+        int Choice;
+        while (true) {
+            System.out.println(
+                    "Press 1 - Shut Down Bank Server \n 2- Get info of particular user \n 3 - Show All Users \n 4 - Remove any Particular User \nChoice: ");
+            Choice = sc.nextInt();
+            switch (Choice) {
+                case 1:
+                    System.out.println("Please Confirm to Shut down(y/n) : ");
+                    ch = sc.next().charAt(0);
+                    if (ch == 'y' || ch == 'Y') {
+                        System.out.println("Bank Server Closed");
+                        System.exit(0);
+                    }
+                    break;
+                case 2:
+                    System.out.println("Enter User Id to Search : ");
+                    at_user = sc.nextInt();
+                    for (int i = 0; i < database_acc_num.size(); i++) {
+                        if (i == at_user) {
+                            System.out.println("User Name : " + database_name.get(i));
+                            System.out.println("Password : " + database_pass.get(i));
+                            System.out.println("Mobile Number : " + database_mob_num.get(i));
+                            System.out.println("Account Number : " + database_acc_num.get(i));
+                            System.out.println("\n");
+                            break;
                         }
-                        break;
-                        case 2:
-                        System.out.println("Enter User Id to Search : ");
-                        at_user = sc.nextInt();
-                        for(int i=0;i<database_acc_num.size();i++){
-                        if(i==at_user){
-                              System.out.println("User Name : " + database_name.get(i));
-                              System.out.println("Password : " + database_pass.get(i));
-                              System.out.println("Mobile Number : " + database_mob_num.get(i));
-                              System.out.println("Account Number : " + database_acc_num.get(i));
-                              System.out.println("\n");
-                              break;
-                        }
-                  } 
-                  break;
-                  case 3:
-                  int j=0;
-                  for(;j<database_name.size();j++){
+                    }
+                    break;
+                case 3:
+                    int j = 0;
+                    for (; j < database_name.size(); j++) {
                         System.out.println("User Name : " + database_name.get(j));
                         System.out.println("Password : " + database_pass.get(j));
                         System.out.println("Mobile Number : " + database_mob_num.get(j));
                         System.out.println("Account Number : " + database_acc_num.get(j));
                         System.out.println("\n");
-                  } 
-                  break;
-                  case 4:
-                  System.out.println("Enter User id to remove : ");
-                  at_user = sc.nextInt();
-                  for(int i=0;i<database_acc_num.size();i++){
-                        if(database_acc_num.subList(database_acc_num.size()-3,database_acc_num.size()).equals(at_user)){
-                              System.out.println("User Name : " + database_name.get(i));
-                              System.out.println("Password : " + database_pass.get(i));
-                              System.out.println("Mobile Number : " + database_mob_num.get(i));
-                              System.out.println("Account Number : " + database_acc_num.get(i));
-                              System.out.println("\n"); 
-                              database_name.remove(i);
-                              database_pass.remove(i);
-                              database_acc_num.remove(i);
-                              database_mob_num.remove(i);
-                              break;
+                    }
+                    break;
+                case 4:
+                    System.out.println("Enter User id to remove : ");
+                    at_user = sc.nextInt();
+                    for (int i = 0; i < database_acc_num.size(); i++) {
+                        if (database_acc_num.subList(database_acc_num.size() - 3, database_acc_num.size())
+                                .equals(at_user)) {
+                            System.out.println("User Name : " + database_name.get(i));
+                            System.out.println("Password : " + database_pass.get(i));
+                            System.out.println("Mobile Number : " + database_mob_num.get(i));
+                            System.out.println("Account Number : " + database_acc_num.get(i));
+                            System.out.println("\n");
+                            database_name.remove(i);
+                            database_pass.remove(i);
+                            database_acc_num.remove(i);
+                            database_mob_num.remove(i);
+                            break;
                         }
-                  }
-                  break; 
-                  default:
-                  System.out.println("Invalid Choice");
-                  break;
-            }//end of switch
-      }//while loop
-            
-      }//end of main method
-}
-//Conversion of the instance into Bytes through serialization
-// class UserData implements Serializable{
-//       String name, password, mobileNumber, accountNumber,sent_acc,sent_amount;
+                    }
+                    break;
+                default:
+                    System.out.println("Invalid Choice");
+                    break;
+            }// end of switch
+        } // while loop
 
-//       UserData(String name, String password, String mobileNumber, String accountNumber, String accString, String amountString) {
-//           this.name = name;
-//           this.password = password;
-//           this.mobileNumber = mobileNumber;
-//           this.accountNumber = accountNumber;
-//           this.sent_acc = accString;
-//           this.sent_amount = amountString;
-//       }
-//       UserData(String name, String password, String mobileNumber, String accountNumber) {
-//           this.name = name;
-//           this.password = password;
-//           this.mobileNumber = mobileNumber;
-//           this.accountNumber = accountNumber;
-//       }
-  
-//       // For displaying user details
-//       public String toString() {
-//           return "Name: " + name + ", Password: " + password + ", Mobile: " + mobileNumber + ", Account: " + accountNumber + ", To: " + sent_acc + ", Sent Amount: " + sent_amount;
-//       }
-// }  
+    }// end of main method
+}
 
 class UserData implements Serializable {
     String name, password, mobileNumber, accountNumber;
-    ArrayList<Transaction> transactions;  // Store transaction history
+    ArrayList<Transaction> transactions; // Store transaction history
 
     UserData(String name, String password, String mobileNumber, String accountNumber) {
         this.name = name;
         this.password = password;
         this.mobileNumber = mobileNumber;
         this.accountNumber = accountNumber;
-        this.transactions = new ArrayList<>();  // Initialize transaction history
+        this.transactions = new ArrayList<>(); // Initialize transaction history
     }
 
     // Add a transaction to the history
@@ -597,4 +575,3 @@ class Transaction implements Serializable {
         return "To: " + toAccount + ", Amount: " + amount + ", Timestamp: " + timestamp;
     }
 }
-
