@@ -341,7 +341,7 @@ class Bank extends Frame implements ActionListener {
                 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(transaction);
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -359,7 +359,7 @@ class Bank extends Frame implements ActionListener {
                 }
             }
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
         return transactionList;
     }
@@ -428,7 +428,7 @@ class Bank extends Frame implements ActionListener {
         d.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent we) {
                 saveUserData();
-                System.out.println("Bank Server Closed");
+                // System.out.println("Bank Server Closed");
                 d.dispose();
             }
         });
