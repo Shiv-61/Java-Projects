@@ -401,21 +401,26 @@ class Bank extends Frame implements ActionListener {
                 int amount;
                 try {
                     amount = Integer.parseInt(amountStr);
-                    if (amount > balance) {
+                    if (userAcc.isEmpty()) {
                         messageLabel.setForeground(Color.red);
-                        messageLabel.setText("Insufficient balance");
+                        messageLabel.setText("Invalid Account Number");
                     } else {
-                        balance -= amount;
-                        messageLabel.setForeground(Color.green);
-                        messageLabel.setText("Payment successful! Remaining balance: " + balance);
+                        if (amount > balance) {
+                            messageLabel.setForeground(Color.red);
+                            messageLabel.setText("Insufficient balance");
+                        } else {
+                            balance -= amount;
+                            messageLabel.setForeground(Color.green);
+                            messageLabel.setText("Payment successful! Remaining balance: " + balance);
 
-                        // Create and save the transaction for the logged-in user
-                        UserData currentUser = findUserByAccountNumber(store_acc_num);
-                        if (currentUser != null) {
-                            Transaction newTransaction = new Transaction(userAcc, amount, LocalDateTime.now());
-                            currentUser.addTransaction(userAcc, amount, LocalDateTime.now());
-                            saveTransaction(newTransaction); // Save transaction to file
-                            saveUserData(); // Save updated user data
+                            // Create and save the transaction for the logged-in user
+                            UserData currentUser = findUserByAccountNumber(store_acc_num);
+                            if (currentUser != null) {
+                                Transaction newTransaction = new Transaction(userAcc, amount, LocalDateTime.now());
+                                currentUser.addTransaction(userAcc, amount, LocalDateTime.now());
+                                saveTransaction(newTransaction); // Save transaction to file
+                                saveUserData(); // Save updated user data
+                            }
                         }
                     }
                 } catch (NumberFormatException ex) {
